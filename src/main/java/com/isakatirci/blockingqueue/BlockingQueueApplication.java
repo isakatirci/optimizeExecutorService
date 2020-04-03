@@ -9,22 +9,17 @@ import java.util.concurrent.*;
 public class BlockingQueueApplication {
     //static int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
     static int numberOfThread = 500;
-    static ArrayList<LinkedBlockingDeque<String>> blockingQueueList = new ArrayList<>(numberOfThread);
     static ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
-    static List<Consumer> list = new ArrayList<>();
+    static List<Consumer> consumers = new ArrayList<>();
 
     public static void main(String[] args) {
         StopWatch watch = new StopWatch();
         watch.start();
         for (int i = 0; i < numberOfThread; i++) {
-            blockingQueueList.add(new LinkedBlockingDeque<String>());
-        }
-        for (int i = 0; i < numberOfThread; i++) {
-            Consumer consumer = new Consumer(blockingQueueList.get(i), i);
-            list.add(consumer);
+            Consumer consumer = new Consumer(new LinkedBlockingDeque<String>());
+            consumers.add(consumer);
             executorService.submit(consumer);
         }
-
         int j = 0;
         while (j < 1000) {
             try {
@@ -32,21 +27,21 @@ public class BlockingQueueApplication {
                 int mixSize = Integer.MAX_VALUE;
                 int index = 0;
                 for (int i = 0, length = numberOfThread; i < length; i++) {
-                    int size = blockingQueueList.get(i).size();
+                    int size = consumers.get(i).getBlockingQueueList().size();
                     if (mixSize > size) {
                         mixSize = size;
                         index = i;
                     }
                 }
-                blockingQueueList.get(index).put("j => " + j);
+                consumers.get(index).getBlockingQueueList().put("j => " + j);
             } catch (Exception e) {
 
             }
         }
         while (true) {
             boolean all = true;
-            for (int i = 0, length = list.size(); i < length; i++) {
-                Consumer consumer = list.get(i);
+            for (int i = 0, length = consumers.size(); i < length; i++) {
+                Consumer consumer = consumers.get(i);
                 int size = consumer.getBlockingQueueList().size();
                 if (size != 0) {
                     all = false;

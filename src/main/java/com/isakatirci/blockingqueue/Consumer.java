@@ -10,8 +10,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Consumer implements Runnable {
 
     private LinkedBlockingDeque<String> blockingQueueList;
-    private int index;
     private AtomicBoolean shutdown = new AtomicBoolean(false);
+
+    public Consumer(LinkedBlockingDeque<String> blockingQueueList) {
+        this.blockingQueueList = blockingQueueList;
+    }
+
+    @Override
+    public void run() {
+        while (!shutdown.get()) {
+            try {
+                String str = ThreadLocalRandom.current().nextInt(2) == 0
+                        ? blockingQueueList.takeFirst()
+                        : blockingQueueList.takeLast();
+                System.out.println(
+                        "thread:" + Thread.currentThread().getId() + " size => "
+                                + blockingQueueList.size()
+                                + " " + str);
+                Thread.sleep(5000);
+            } catch (Exception e) {
+
+            }
+        }
+        System.out.println("thread:" + Thread.currentThread().getId() + " finish!");
+    }
 
     public LinkedBlockingDeque<String> getBlockingQueueList() {
         return blockingQueueList;
@@ -31,29 +53,5 @@ public class Consumer implements Runnable {
 
     public void setShutdown(AtomicBoolean shutdown) {
         this.shutdown = shutdown;
-    }
-
-    public Consumer(LinkedBlockingDeque<String> blockingQueueList, int index) {
-        this.blockingQueueList = blockingQueueList;
-        this.index = index;
-    }
-
-    @Override
-    public void run() {
-        while (!shutdown.get()) {
-            try {
-                String str = ThreadLocalRandom.current().nextInt(2) == 0
-                        ? blockingQueueList.takeFirst()
-                        : blockingQueueList.takeLast();
-                System.out.println(
-                        "thread:" + Thread.currentThread().getId() + " hub:" + index + " size => "
-                                + blockingQueueList.size()
-                                + " " + str);
-                Thread.sleep(5000);
-            } catch (Exception e) {
-
-            }
-        }
-        System.out.println("thread:" + Thread.currentThread().getId() + " finish!");
     }
 }
