@@ -4,25 +4,22 @@ import org.springframework.util.StopWatch;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class BlockingQueueApplication {
     //static int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
-   static int N_CONSUMERS = 500;
-    static ArrayList<LinkedBlockingDeque<String>> blockingQueueList = new ArrayList<>(N_CONSUMERS);
-    static ExecutorService executorService = Executors.newFixedThreadPool(N_CONSUMERS);
+    static int numberOfThread = 500;
+    static ArrayList<LinkedBlockingDeque<String>> blockingQueueList = new ArrayList<>(numberOfThread);
+    static ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
     static List<Consumer> list = new ArrayList<>();
 
     public static void main(String[] args) {
         StopWatch watch = new StopWatch();
         watch.start();
-        for (int i = 0; i < N_CONSUMERS; i++) {
+        for (int i = 0; i < numberOfThread; i++) {
             blockingQueueList.add(new LinkedBlockingDeque<String>());
         }
-        for (int i = 0; i < N_CONSUMERS; i++) {
+        for (int i = 0; i < numberOfThread; i++) {
             Consumer consumer = new Consumer(blockingQueueList.get(i), i);
             list.add(consumer);
             executorService.submit(consumer);
@@ -34,7 +31,7 @@ public class BlockingQueueApplication {
                 j++;
                 int mixSize = Integer.MAX_VALUE;
                 int index = 0;
-                for (int i = 0, length = N_CONSUMERS; i < length; i++) {
+                for (int i = 0, length = numberOfThread; i < length; i++) {
                     int size = blockingQueueList.get(i).size();
                     if (mixSize > size) {
                         mixSize = size;
@@ -68,7 +65,7 @@ public class BlockingQueueApplication {
         }
         executorService.shutdown();
         try {
-            executorService.awaitTermination(10,TimeUnit.SECONDS);
+            executorService.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

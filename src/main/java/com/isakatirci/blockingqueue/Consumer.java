@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Consumer implements Runnable {
@@ -41,7 +42,9 @@ public class Consumer implements Runnable {
     public void run() {
         while (!shutdown.get()) {
             try {
-                String str = blockingQueueList.take();
+                String str = ThreadLocalRandom.current().nextInt(2) == 0
+                        ? blockingQueueList.takeFirst()
+                        : blockingQueueList.takeLast();
                 System.out.println(
                         "thread:" + Thread.currentThread().getId() + " hub:" + index + " size => "
                                 + blockingQueueList.size()
