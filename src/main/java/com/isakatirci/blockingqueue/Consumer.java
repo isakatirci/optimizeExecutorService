@@ -4,47 +4,43 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Consumer implements Runnable {
 
-    private LinkedBlockingDeque<String> blockingQueueList;
-    private AtomicBoolean shutdown = new AtomicBoolean(false);
+    private LinkedBlockingQueue<String> blockingQueueList;
 
-    public Consumer(LinkedBlockingDeque<String> blockingQueueList) {
+    public Consumer(LinkedBlockingQueue<String> blockingQueueList) {
         this.blockingQueueList = blockingQueueList;
     }
 
     @Override
     public void run() {
-        while (!this.getShutdown()) {
-            try {
-                String str = ThreadLocalRandom.current().nextInt(2) == 0
-                        ? blockingQueueList.takeFirst()
-                        : blockingQueueList.takeLast();
+        try {
+            while (true) {
+                String str = blockingQueueList.take();
+                if (str == "POISON") {
+                    System.out.println("thread:" + Thread.currentThread().getId() + " finish!"
+                            + " blockingQueueList.size() => " + blockingQueueList.size());
+                    break;
+                }
                 System.out.println(
                         "thread:" + Thread.currentThread().getId() + " size => "
                                 + blockingQueueList.size()
                                 + " " + str);
                 Thread.sleep(1000);
-            } catch (Exception e) {
-                System.out.println("Eror: size => " + blockingQueueList.size());
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.out.println("Error: size => " + blockingQueueList.size());
         }
-        System.out.println("thread:" + Thread.currentThread().getId() + " finish!"
-                + " blockingQueueList.size() => " + blockingQueueList.size());
     }
 
-    public LinkedBlockingDeque<String> getBlockingQueueList() {
+    public LinkedBlockingQueue<String> getBlockingQueueList() {
         return blockingQueueList;
     }
 
-    public boolean getShutdown() {
-        return shutdown.get();
-    }
 
-    public void setShutdown(boolean shutdown) {
-        this.shutdown.set(shutdown);
-    }
 }
