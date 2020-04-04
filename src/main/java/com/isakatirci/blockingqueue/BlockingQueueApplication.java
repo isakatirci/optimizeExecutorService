@@ -8,10 +8,9 @@ import java.util.concurrent.*;
 
 public class BlockingQueueApplication {
     //static int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
-    static int numberOfThread = 200;
+    static int numberOfThread = 500;
     static ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
     static List<Consumer> consumers = new ArrayList<>();
-    static List<Future<String>> consumerFutures = new ArrayList<>();
 
     public static void main(String[] args) {
         StopWatch watch = new StopWatch();
@@ -19,11 +18,9 @@ public class BlockingQueueApplication {
         for (int i = 0; i < numberOfThread; i++) {
             Consumer consumer = new Consumer(new LinkedBlockingDeque<String>());
             consumers.add(consumer);
-            Future<String> consumerFuture = executorService.submit(consumer, "ok");
-            consumerFutures.add(consumerFuture);
         }
         int j = 0;
-        while (j < 1000) {
+        while (j < 10000) {
             try {
                 j++;
                 int mixSize = Integer.MAX_VALUE;
