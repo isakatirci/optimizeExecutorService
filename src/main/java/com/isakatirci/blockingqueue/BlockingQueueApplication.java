@@ -18,17 +18,15 @@ public class BlockingQueueApplication {
         for (int i = 0; i < numberOfThread; i++) {
             Consumer consumer = new Consumer(new LinkedBlockingDeque<String>());
             consumers.add(consumer);
+            executorService.submit(consumer);
         }
         int j = 0;
-        while (j < 10000) {
+        while (j < 5000) {
             try {
                 j++;
                 int mixSize = Integer.MAX_VALUE;
                 int index = 0;
                 for (int i = 0, length = numberOfThread; i < length; i++) {
-                    if (i % 2 == 0) {
-                        continue;
-                    }
                     int size = consumers.get(i).getBlockingQueueList().size();
                     if (mixSize > size) {
                         mixSize = size;
@@ -54,9 +52,15 @@ public class BlockingQueueApplication {
                 continue;
             }
             consumer.setShutdown(true);
-            consumers.get(i).run();
         }
-        executorService.shutdownNow();
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         watch.stop();
         System.out.println("Time Elapsed: " + watch.getTotalTimeSeconds());
     }

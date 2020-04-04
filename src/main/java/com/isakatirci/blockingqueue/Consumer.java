@@ -29,7 +29,7 @@ public class Consumer implements Runnable {
                                 + " " + str);
                 Thread.sleep(1000);
             } catch (Exception e) {
-
+                System.out.println("Eror: size => " + blockingQueueList.size());
             }
         }
         System.out.println("thread:" + Thread.currentThread().getId() + " finish!"
