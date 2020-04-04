@@ -18,7 +18,7 @@ public class Consumer implements Runnable {
 
     @Override
     public void run() {
-        while (!shutdown.get()) {
+        while (!this.getShutdown()) {
             try {
                 String str = ThreadLocalRandom.current().nextInt(2) == 0
                         ? blockingQueueList.takeFirst()
@@ -27,31 +27,24 @@ public class Consumer implements Runnable {
                         "thread:" + Thread.currentThread().getId() + " size => "
                                 + blockingQueueList.size()
                                 + " " + str);
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             } catch (Exception e) {
 
             }
         }
-        System.out.println("thread:" + Thread.currentThread().getId() + " finish!");
+        System.out.println("thread:" + Thread.currentThread().getId() + " finish!"
+                + " blockingQueueList.size() => " + blockingQueueList.size());
     }
 
     public LinkedBlockingDeque<String> getBlockingQueueList() {
         return blockingQueueList;
     }
 
-    public void setBlockingQueueList(LinkedBlockingDeque<String> blockingQueueList) {
-        this.blockingQueueList = blockingQueueList;
+    public boolean getShutdown() {
+        return shutdown.get();
     }
 
-    public AtomicBoolean isShutdown() {
-        return shutdown;
-    }
-
-    public AtomicBoolean getShutdown() {
-        return shutdown;
-    }
-
-    public void setShutdown(AtomicBoolean shutdown) {
-        this.shutdown = shutdown;
+    public void setShutdown(boolean shutdown) {
+        this.shutdown.set(shutdown);
     }
 }

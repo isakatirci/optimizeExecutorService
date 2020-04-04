@@ -8,9 +8,10 @@ import java.util.concurrent.*;
 
 public class BlockingQueueApplication {
     //static int N_CONSUMERS = Runtime.getRuntime().availableProcessors();
-    static int numberOfThread = 500;
+    static int numberOfThread = 200;
     static ExecutorService executorService = Executors.newFixedThreadPool(numberOfThread);
     static List<Consumer> consumers = new ArrayList<>();
+    static List<Future<String>> consumerFutures = new ArrayList<>();
 
     public static void main(String[] args) {
         StopWatch watch = new StopWatch();
@@ -18,7 +19,8 @@ public class BlockingQueueApplication {
         for (int i = 0; i < numberOfThread; i++) {
             Consumer consumer = new Consumer(new LinkedBlockingDeque<String>());
             consumers.add(consumer);
-            executorService.submit(consumer);
+            Future<String> consumerFuture = executorService.submit(consumer, "ok");
+            consumerFutures.add(consumerFuture);
         }
         int j = 0;
         while (j < 1000) {
@@ -27,6 +29,9 @@ public class BlockingQueueApplication {
                 int mixSize = Integer.MAX_VALUE;
                 int index = 0;
                 for (int i = 0, length = numberOfThread; i < length; i++) {
+                    if (i % 2 == 0) {
+                        continue;
+                    }
                     int size = consumers.get(i).getBlockingQueueList().size();
                     if (mixSize > size) {
                         mixSize = size;
@@ -35,36 +40,27 @@ public class BlockingQueueApplication {
                 }
                 consumers.get(index).getBlockingQueueList().put("j => " + j);
             } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
-            }
-        }
-        while (true) {
-            boolean all = true;
-            for (int i = 0, length = consumers.size(); i < length; i++) {
-                Consumer consumer = consumers.get(i);
-                int size = consumer.getBlockingQueueList().size();
-                if (size != 0) {
-                    all = false;
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    continue;
+        for (int i = 0; i < numberOfThread; i++) {
+            Consumer consumer = consumers.get(i);
+            int size = consumer.getBlockingQueueList().size();
+            if (size != 0) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                consumer.getShutdown().set(true);
+                i--;
+                continue;
             }
-            if (all) {
-                break;
-            }
+            consumer.setShutdown(true);
+            consumers.get(i).run();
         }
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        executorService.shutdownNow();
         watch.stop();
-        System.out.println("Time Elapsed: " + watch.getTotalTimeSeconds()); // Prints: Time Elapsed: 2501
+        System.out.println("Time Elapsed: " + watch.getTotalTimeSeconds());
     }
 }
