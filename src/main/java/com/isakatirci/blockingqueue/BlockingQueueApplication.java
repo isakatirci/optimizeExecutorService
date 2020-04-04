@@ -17,6 +17,7 @@ public class BlockingQueueApplication {
         for (int i = 0; i < numberOfThread; i++) {
             Consumer consumer = new Consumer(new LinkedBlockingQueue<>());
             consumers.add(consumer);
+            executorService.submit(consumer);
         }
         for (int j = 0; j < 5000; j++) {
             try {

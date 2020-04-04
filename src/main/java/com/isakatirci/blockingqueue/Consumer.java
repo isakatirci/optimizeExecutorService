@@ -1,12 +1,6 @@
 package com.isakatirci.blockingqueue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Consumer implements Runnable {
 
@@ -41,6 +35,4 @@ public class Consumer implements Runnable {
     public LinkedBlockingQueue<String> getBlockingQueueList() {
         return blockingQueueList;
     }
-
-
 }
