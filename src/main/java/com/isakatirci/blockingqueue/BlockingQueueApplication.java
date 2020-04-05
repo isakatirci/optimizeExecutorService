@@ -110,22 +110,22 @@ public class BlockingQueueApplication {
         System.setProperty("webdriver.chrome.driver",
                 "D:\\28 Mart Backup\\browser-mob-test\\src\\main\\resources\\chromedriver.exe");
         ChromeOptions options = new ChromeOptions();
-        options.addArguments(new String[]{"--window-size=1680,945"});
-        options.addArguments(new String[]{"--disable-extensions"});
+        options.addArguments("--window-size=1680,945");
+        options.addArguments("--disable-extensions");
         options.setExperimentalOption("useAutomationExtension", false);
-        options.addArguments(new String[]{"--start-maximized"});
-        options.addArguments(new String[]{"--headless"});
-        options.addArguments(new String[]{"--no-sandbox"});
-        options.addArguments(new String[]{"--disable-dev-shm-usage"});
-        options.addArguments(new String[]{"--disable-reading-from-canvas"});
-        options.addArguments(new String[]{"--disable-webgl"});
-        options.addArguments(new String[]{"--incognito"});
+        options.addArguments("--start-maximized");
+        options.addArguments("--headless");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-reading-from-canvas");
+        options.addArguments("--disable-webgl");
+        options.addArguments("--incognito");
         options.setExperimentalOption("detach", true);
         options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable("performance", Level.ALL);
-        options.setCapability("goog:loggingPrefs", logPrefs);
-        //this most important
+        //LoggingPreferences logPrefs = new LoggingPreferences();
+        //logPrefs.enable("performance", Level.ALL);
+        //options.setCapability("goog:loggingPrefs", logPrefs);
+        //this most important options
         options.setPageLoadStrategy(PageLoadStrategy.NONE);
 /*        if (proxy != null && !proxy.isNonProxy(url)) {
             options.addArguments(new String[]{"--proxy-server==" + proxy.getProxyHost() + ":" + proxy.getProxyPort()});
