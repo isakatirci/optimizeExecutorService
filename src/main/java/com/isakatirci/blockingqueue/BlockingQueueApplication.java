@@ -119,7 +119,7 @@ public class BlockingQueueApplication {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-reading-from-canvas");
         options.addArguments("--disable-webgl");
-        options.addArguments("--incognito");
+        //options.addArguments("--incognito");
         options.setExperimentalOption("detach", true);
         options.setExperimentalOption("excludeSwitches", Arrays.asList("enable-automation"));
         //LoggingPreferences logPrefs = new LoggingPreferences();
