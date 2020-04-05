@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Consumer implements Runnable {
 
     private final LinkedBlockingQueue<String> blockingQueueList;
-    private final WebDriver webDriver;
+    private WebDriver webDriver;
     private AtomicBoolean running = new AtomicBoolean(false);
 
     public boolean getRunning() {
@@ -37,6 +37,13 @@ public class Consumer implements Runnable {
                 if (str == "POISON") {
                     System.out.println("thread:" + Thread.currentThread().getId() + " finish!"
                             + " blockingQueueList.size() => " + blockingQueueList.size());
+                    if (this.webDriver != null) {
+                        this.webDriver.close();
+                        if (this.webDriver != null) {
+                            this.webDriver.quit();
+                            this.webDriver = null;
+                        }
+                    }
                     break;
                 }
                 System.out.println(
